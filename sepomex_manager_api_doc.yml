@@ -1,0 +1,406 @@
+# Example YAML to get you started quickly.
+# Be aware that YAML has indentation based coping.
+# Code completion support is available so start typing for available options.
+swagger: '2.0'
+info:
+  version: "1.0.0"
+  title: FuelManager - Gestor de Flotilla/Gas para Vehículos
+  description: |
+    </br>
+    API para Gestionar Gasolina y flotilla de vehículos.
+    CRUD functions can be applied to manage the data.
+    </br>
+    </br>
+  contact: 
+      name: API Support
+      url: https://github.com/jorgeMorfinezM/GasControllerApi/blob/master/README.md
+      email: jorge.morfinez.m@gmail.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  
+host:
+  localhost:8080
+basePath: "/api/v1/manager"
+schemes:
+  - https
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+#components:
+#    securitySchemes:
+#    bearerAuth:
+#      type: https
+#      scheme: bearer
+#      bearerFormat: JWT
+#securityDefinitions:
+#  OAuth2:
+#    description: Contiene la llamada a autenticar la API para obtener el Bearer Token
+#    type: oauth2
+#    flow: accessCode
+#    authorizationUrl: https://cargamos-api-test.herokuapp.com/api/ecommerce/authorization/
+#    tokenUrl: https://cargamos-api-test.herokuapp.com/api/ecommerce/authorization/
+# Describe your paths here
+tags:
+  - name: "Login"
+    description: "Endpoint to get Token Bearer POST the username and password registered"
+  - name: "List Users"
+    description: "Endpoint to list Users"
+  - name: "Insert Driver"
+    description: "Endpoint to insert"
+  - name: "GET List Drivers"
+    description: "Get the list of the Drivers"
+  - name: "Manage Stores"
+    description: "Endpoint to manage Store data using: add, get, delete and update methods to and from the database"
+  - name: "Manage Products"
+    description: "Endpoint to manage product data using: add, get, delete and update methods to and from the database"
+
+paths:
+  /login/:
+    post:
+      tags:
+        - "Login"
+      description:
+        Get Bearer Token by username, password and RFC ciudad to authenticate to the API endpoints.
+      parameters:
+        - name: Authorization
+          in: body
+          description: Payload with authentication credentials to API.
+          required: true
+          schema:
+            $ref: '#/definitions/Authorization'
+      responses:
+        200:
+          description: Successful response Token Bearer
+          schema:
+            title: TokenRequest
+            type: array
+            items:
+              $ref: '#/definitions/TokenRequest'
+        404:
+          description: Page Not Found
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request Data Conflict
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Error'
+        401:
+          description: 401 Unauthorized
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Error'
+        500:
+          description: Server Error
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Error'
+
+  /list/:
+    get:
+      tags:
+        - "List Users"
+      description:
+        Get All users registered (only by admins).
+#      parameters:
+#        - name: Authorization
+#          in: body
+#          description: Payload with authentication credentials to API.
+#          required: true
+#          schema:
+#            $ref: '#/definitions/Authorization'
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title: DataUserLogin
+            type: array
+            items:
+              $ref: '#/definitions/DataUserLogin'
+        404:
+          description: Page Not Found
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request Data Conflict
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Error'
+        401:
+          description: 401 Unauthorized
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Error'
+        500:
+          description: Server Error
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Error'
+
+  /gas/driver/:
+    post:
+      tags:
+        - "Insert Driver"
+      description:
+        Insert data Driver.
+      parameters:
+        - name: RequestDriver
+          in: body
+          description: Payload with Driver data to insert.
+          required: true
+          schema:
+            $ref: '#/definitions/RequestDriver'
+      responses:
+        200:
+          description: Successful response Driver Register
+          schema:
+            title: ResponseDriver
+            type: array
+            items:
+              $ref: '#/definitions/ResponseDriver'
+        404:
+          description: Page Not Found
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request Data Conflict
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Error'
+        401:
+          description: 401 Unauthorized
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Error'
+        500:
+          description: Server Error
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Error'
+    get:
+      tags:
+        - "GET List Drivers"
+      description:
+        Get data Driver.
+      parameters:
+        - name: RequestDriver
+          in: body
+          description: Payload with pagination data to Get.
+          required: true
+          schema:
+            $ref: '#/definitions/Pagination'
+      responses:
+        200:
+          description: Successful response Driver Register
+          schema:
+            title: ResponseDriver
+            type: array
+            items:
+              $ref: '#/definitions/ResponseDriver'
+        404:
+          description: Page Not Found
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: Request Data Conflict
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Error'
+        401:
+          description: 401 Unauthorized
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Error'
+        500:
+          description: Server Error
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Error'
+
+
+definitions:
+  Error:
+    allOf:
+      - $ref: '#/definitions/Error'
+      - required:
+        - error_code
+        - error_message
+        type: "object"
+        properties:
+          error_code:
+            type: integer
+            format: int32
+          error_message:
+            type: string
+
+  Authorization:
+    allOf:
+      - $ref: '#/definitions/Authorization'
+      - required:
+        - username
+        - password
+        - is_active
+        - is_staff
+        - is_superuser
+        type: "object"
+        properties:
+          username:
+            type: string
+          password:
+            type: string
+          is_active:
+            type: boolean
+          is_staff:
+            type: boolean
+          is_superuser:
+            type: boolean
+
+  TokenRequest:
+    allOf:
+      - $ref: '#/definitions/TokenRequest'
+      - required:
+        - message_login
+        - access_token
+        - refresh_token
+        - data
+        type: "object"
+        properties:
+          message_login:
+            type: string
+          access_token:
+            type: string
+          refresh_token:
+            type: string
+          data:
+            type: array
+              items:
+                $ref: '#/definitions/DataUserLogin'
+
+  DataUserLogin:
+    allOf:
+      - $ref: '#/definitions/DataUserLogin'
+      - required:
+        - Username
+        - Password
+        - IsActive
+        - IsStaff
+        - IsSuperUser
+        - CreationDate
+        - UpdatedDate
+        type: "object"
+        properties:
+          Username:
+            type: string
+          Password:
+            type: string
+          IsActive:
+            type: boolean
+          IsStaff:
+            type: boolean
+          IsSuperUser:
+            type: boolean
+          CreationDate:
+            type: string
+          UpdatedDate:
+            type: string
+
+  RequestDriver:
+    allOf:
+      - $ref: '#/definitions/RequestDriver'
+      - required:
+        - nombre_conductor
+        - apellido_paterno_conductor
+        - apellido_materno_conductor
+        - domicilio_conductor
+        - estatus_conductor
+        - vehiculo
+        - rol_usuario
+        type: "object"
+        properties:
+          nombre_conductor:
+            type: string
+          apellido_paterno_conductor:
+            type: string
+          apellido_materno_conductor:
+            type: string
+          domicilio_conductor:
+            type: string
+          estatus_conductor:
+            type: string
+          vehiculo:
+            type: integer
+            format: int64
+          rol_usuario:
+            type: integer
+            format: int64
+
+  ResponseDriver:
+    allOf:
+      - $ref: "#/definitions/ResponseDriver"
+      - required:
+        - id_driver
+        - name_driver
+        - lastname_driver
+        - lastname_last_driver
+        - address_driver
+        - driver_added_date
+        - status_driver
+        - vehicle_driver
+        - vehicle_manufacturer
+        - vehicle_model
+        - vehicle_brand
+        - role_driver
+        - last_date_updated
+        type: "object"
+        properties:
+          id_driver:
+            type: integer
+            format: int64
+          name_driver:
+            type: string
+          lastname_driver:
+            type: string
+          lastname_last_driver:
+            type: string
+          address_driver:
+            type: string
+          driver_added_date:
+            type: string
+          status_driver:
+            type: string
+          vehicle_driver:
+            type: string
+          vehicle_manufacturer:
+            type: string
+          vehicle_model:
+            type: string
+          vehicle_brand:
+            type: string
+          rol_driver:
+            type: integer
+            format: int64
+          last_date_updated:
+            type: string
