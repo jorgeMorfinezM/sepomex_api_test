@@ -28,206 +28,102 @@ logger = configure_logger('ws')
 
 @suburb_api.route('/', methods=['POST', 'GET'])
 # @jwt_required
-def endpoint_manage_vehicle_data():
+def endpoint_manage_suburb_data():
     conn_db, session_db = init_db_connection()
 
     headers = request.headers
-    # auth = headers.get('Authorization')
+    auth = headers.get('Authorization')
 
-    # if not auth and 'Bearer' not in auth:
-    #     return HandlerResponse.request_unauthorized()
-    # else:
-
-    query_string = request.query_string.decode('utf-8')
-
-    if request.method == 'POST':
-        # APLICAR INVERSIONES
-
-        data = request.get_json(force=True)
-
-        gin_inv_model = GinInversionesModel(data)
-
-        if not data or str(data) is None:
-            return HandlerResponse.request_conflict(ErrorMsg.ERROR_REQUEST_DATA_CONFLICT)
-
-        logger.info('Data Json Inversion to Manage on DB: %s', str(data))
-
-        fechaRecepcion = str()
-        horaRecepcion = str()
-        fechaAplicacion = str()
-        horaAplicacion = str()
-
-        fecha_recepcion = data.get('fechaRecepcion')
-        hora_recepcion = data.get('horaRecepcion')
-
-        if fecha_recepcion and hora_recepcion:
-            fecha_hora_recepcion = str(datetime.strptime(str(fecha_recepcion), "%Y-%m-%d")) + " " + \
-                                   str(datetime.strptime(str(hora_recepcion), "%H:%M:%S"))
-
-            fechaRecepcion, horaRecepcion = set_utc_date_data(fecha_hora_recepcion, cfg_app.date_timezone)
-
-        fecha_aplicacion = data.get('fechaAplicacion')
-        hora_aplicacion = data.get('horaAplicacion')
-
-        if fecha_aplicacion and hora_aplicacion:
-            fecha_hora_aplicacion = str(datetime.strptime(str(fecha_aplicacion), "%Y-%m-%d")) + " " + \
-                                   str(datetime.strptime(str(hora_aplicacion), "%H:%M:%S"))
-
-            fechaAplicacion, horaAplicacion = set_utc_date_data(fecha_hora_aplicacion, cfg_app.date_timezone)
-
-        data_insert = {
-            'cuenta': data.get('cuenta'),
-            'estatus': data.get('estatus'),
-            'monto': data.get('monto'),
-            'autorizacion': data.get('autorizacion'),
-            'canal': data.get('canal'),
-            'origen': data.get('origen'),
-            'comisionistaId': data.get('comisionistaId'),
-            'transaccionId': data.get('transaccionId'),
-            'motivo': data.get('motivo'),
-            'fechaRecepcion': fechaRecepcion,
-            'horaRecepcion': horaRecepcion,
-            'fechaAplicacion': fechaAplicacion,
-            'horaAplicacion': horaAplicacion,
-            'conciliacionId': data.get('conciliacionId')
-        }
-
-        json_bank_added = gin_inv_model.insert_data(session_db, data_insert)
-
-        if not json_bank_added:
-            return HandlerResponse.resp_success(SuccessMsg.MSG_RECORD_REGISTERED, {})
-
-        return HandlerResponse.resp_success(SuccessMsg.MSG_CREATED_RECORD, json_bank_added)
-
-    elif request.method == 'GET':
-        # To GET ALL Data of the Banks:
-
-        data = dict()
-        inversiones_on_db = None
-
-        filter_spec = []
-
-        if 'canal' in query_string:
-            canal = request.args.get('canal')
-
-            data['canal'] = canal
-
-            filter_spec.append({'field': 'canal', 'op': '==', 'value': canal})
-
-        if 'fecha' in query_string:
-            fecha = request.args.get('fecha')
-
-            fecha_filter = datetime.strptime(str(fecha), "%Y-%m-%d")
-
-            data['fechaRecepcion'] = fecha_filter
-
-            filter_spec.append({'field': 'fechaRecepcion', 'op': '==', 'value': fecha_filter})
-
-        if 'estatus' in query_string:
-            status_inversion = request.args.get('estatus')
-
-            data['estatus'] = status_inversion
-
-            filter_spec.append({'field': 'estatus', 'op': 'ilike', 'value': status_inversion})
-
-        gin_inv_model = GinInversionesModel(data)
-
-        inversiones_on_db = get_driver_by_filters(session_db, filter_spec)
-
-        if not bool(inversiones_on_db) or not inversiones_on_db or "[]" == inversiones_on_db:
-            return HandlerResponse.resp_success(ErrorMsg.ERROR_DATA_NOT_FOUND, {})
-
-        return HandlerResponse.resp_success(SuccessMsg.MSG_GET_RECORD, inversiones_on_db)
-
-    elif request.method == 'PUT':
-
-        data = request.get_json(force=True)
-
-        gin_inv_model = GinInversionesModel(data)
-
-        if not data:
-            return HandlerResponse.request_conflict()
-
-        json_data = dict()
-
-        json_data = gin_inv_model.update_data(session_db, data)
-
-        logger.info('Bank updated Info: %s', str(json_data))
-
-        if not json_data:
-            return HandlerResponse.not_found()
-
-        return HandlerResponse.resp_success(json_data)
-
-    elif request.method == 'DELETE':
-
-        data = dict()
-        # data = request.get_json(force=True)
-
-        filter_spec = []
-
-        if not ('cuenta' in query_string) and ('canal' in query_string) and ('autorizacion' in query_string):
-            return HandlerResponse.request_conflict(ErrorMsg.ERROR_REQUEST_DATA_CONFLICT)
-        else:
-
-            cuenta = request.args.get('cuenta')
-
-            data['cuenta'] = cuenta
-
-            canal = request.args.get('canal')
-
-            data['canal'] = canal
-
-            autorizacion = request.args.get('autorizacion')
-
-            data['autorizacion'] = autorizacion
-
-        gin_inv_model = GinInversionesModel(data)
-
-        json_data = []
-
-        if not data:
-            return HandlerResponse.request_conflict(ErrorMsg.ERROR_REQUEST_DATA_CONFLICT)
-
-        json_response = gin_inv_model.delete_data(session_db, data)
-
-        logger.info('Inversion deleted: %s', json_response)
-
-        if not json_response:
-            return HandlerResponse.resp_success(ErrorMsg.ERROR_DATA_NOT_FOUND, {})
-
-        return HandlerResponse.resp_success(SuccessMsg.MSG_DELETED_RECORD, json_response)
-
+    if not auth and 'Bearer' not in auth:
+        return HandlerResponse.request_unauthorized(ErrorMsg.ERROR_REQUEST_UNAUTHORIZED, auth)
     else:
-        return HandlerResponse.not_found(ErrorMsg.ERROR_REQUEST_NOT_FOUND)
+
+        if request.method == 'POST':
+
+            data = request.get_json(force=True)
+
+            suburb_model = ColoniaModel(data)
+
+            if not data or str(data) is None:
+                return HandlerResponse.request_conflict(ErrorMsg.ERROR_REQUEST_DATA_CONFLICT, data)
+
+            logger.info('Data Json Ciudad to Manage on DB: %s', str(data))
+
+            suburb_response = suburb_model.insert_data(session_db, data)
+
+            logger.info('Data Ciudad to Register on DB: %s', str(data))
+
+            if not suburb_response:
+                return HandlerResponse.response_success(ErrorMsg.ERROR_DATA_NOT_FOUND, suburb_response)
+
+            return HandlerResponse.response_resource_created(SuccessMsg.MSG_CREATED_RECORD, suburb_response)
+
+        elif request.method == 'GET':
+
+            data = dict()
+            suburb_on_db = None
+
+            data['offset'] = request.args.get('offset', 1)
+            data['limit'] = request.args.get('limit', 10)
+
+            suburb_model = ColoniaModel(data)
+
+            suburb_on_db = suburb_model.get_all_suburbs(session_db, data)
+
+            if not bool(suburb_on_db) or not suburb_on_db or "[]" == suburb_on_db:
+                return HandlerResponse.response_success(ErrorMsg.ERROR_DATA_NOT_FOUND, suburb_on_db)
+
+            return HandlerResponse.response_success(SuccessMsg.MSG_GET_RECORD, suburb_on_db)
+
+        else:
+            return HandlerResponse.request_not_found(ErrorMsg.ERROR_METHOD_NOT_ALLOWED)
 
 
 @suburb_api.route('/filter', methods=['GET'])
-def endpoint_looking_for_vehicle():
+def get_looking_for_suburbs():
     conn_db, session_db = init_db_connection()
 
     headers = request.headers
-    # auth = headers.get('Authorization')
+    auth = headers.get('Authorization')
 
-    # if not auth and 'Bearer' not in auth:
-    #     return HandlerResponse.request_unauthorized()
-    # else:
+    if not auth and 'Bearer' not in auth:
+        return HandlerResponse.request_unauthorized(ErrorMsg.ERROR_REQUEST_UNAUTHORIZED, auth)
+    else:
+        data = dict()
 
-    if request.method == 'GET':
-        # GUARDAR DATOS DE INVERSIONES
+        query_string = request.query_string.decode('utf-8')
 
-        data = request.get_json(force=True)
+        if request.method == 'GET':
 
-        gin_inv_model = GinInversionesModel(data)
+            suburb_on_db = None
 
-        if not data or str(data) is None:
-            return HandlerResponse.request_conflict(ErrorMsg.ERROR_REQUEST_DATA_CONFLICT)
+            filter_spec = []
 
-        logger.info('Data Json Inversion to Manage on DB: %s', str(data))
+            data['offset'] = request.args.get('offset', 1)
+            data['limit'] = request.args.get('limit', 10)
 
-        json_inversion_added = gin_inv_model.save_inversion(session_db, data)
+            if 'nombre_colonia' in query_string:
+                suburb_name = request.args.get('nombre_colonia')
 
-        if not json_inversion_added:
-            return HandlerResponse.resp_success(SuccessMsg.MSG_RECORD_REGISTERED, {})
+                data['nombre_colonia'] = suburb_name
 
-        return HandlerResponse.resp_success(SuccessMsg.MSG_CREATED_RECORD, json_inversion_added)
+                filter_spec.append({'field': 'nombre_colonia', 'op': 'ilike', 'value': suburb_name})
+
+            if 'codigo_postal' in query_string:
+                zip_postal_code = request.args.get('codigo_postal')
+
+                data['codigo_postal'] = zip_postal_code
+
+                filter_spec.append({'field': 'codigo_postal', 'op': '==', 'value': zip_postal_code})
+
+            suburb_model = ColoniaModel(data)
+
+            suburb_on_db = suburb_model.get_suburbs_by_filters(session_db, data, filter_spec)
+
+            if not bool(suburb_on_db) or not suburb_on_db or "[]" == suburb_on_db:
+                return HandlerResponse.response_success(ErrorMsg.ERROR_DATA_NOT_FOUND, suburb_on_db)
+
+            return HandlerResponse.response_success(SuccessMsg.MSG_GET_RECORD, suburb_on_db)
+
+        else:
+            return HandlerResponse.request_not_found(ErrorMsg.ERROR_METHOD_NOT_ALLOWED)

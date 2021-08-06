@@ -274,7 +274,7 @@ class MunicipioModel(Base):
             town_id_state = town.ciudad_id_estado
 
             town_data += [{
-                "State": {
+                "Town": {
                     "id_municipio": str(town_id),
                     "nombre_municipio": town_name,
                     "clave_municipio": town_key,
@@ -323,7 +323,7 @@ class MunicipioModel(Base):
             town_id_state = town.ciudad_id_estado
 
             town_data += [{
-                "State": {
+                "Town": {
                     "id_municipio": str(town_id),
                     "nombre_municipio": town_name,
                     "clave_municipio": town_key,

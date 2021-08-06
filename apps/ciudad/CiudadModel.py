@@ -275,7 +275,7 @@ class CiudadModel(Base):
             city_id_town = city.ciudad_id_municipio
 
             city_data += [{
-                "State": {
+                "City": {
                     "id_ciudad": str(city_id),
                     "nombre_ciudad": city_name,
                     "clave_ciudad": city_key,
@@ -324,7 +324,7 @@ class CiudadModel(Base):
             city_id_town = city.ciudad_id_municipio
 
             city_data += [{
-                "State": {
+                "City": {
                     "id_ciudad": str(city_id),
                     "nombre_ciudad": city_name,
                     "clave_ciudad": city_key,

@@ -134,31 +134,33 @@ class ColoniaModel(Base):
 
             try:
 
-                new_row = CiudadModel(data)
+                new_row = ColoniaModel(data)
 
-                logger.info('New Row Ciudad: %s', str(new_row.nombre_ciudad))
+                logger.info('New Row Colonia: %s', str(new_row.nombre_colonia))
 
                 session.add(new_row)
 
-                row_city = self.get_suburb_id(session, data)
+                row_suburb = self.get_suburb_id(session, data)
 
-                logger.info('Ciudad ID Inserted: %s', str(row_city.id_ciudad))
+                logger.info('Ciudad ID Inserted: %s', str(row_suburb.id_colonia))
 
                 session.flush()
 
-                data['id_ciudad'] = row_city.id_ciudad
+                data['id_colonia'] = row_suburb.id_colonia
 
                 # check insert correct
                 row_inserted = self.get_one_suburb(session, data)
 
-                logger.info('Data Ciudad inserted: %s, Original Data: {}'.format(data), str(row_inserted))
+                logger.info('Data Colonia inserted: %s, Original Data: {}'.format(data), str(row_inserted))
 
                 if row_inserted:
                     endpoint_response = json.dumps({
-                        "id_ciudad": str(row_inserted.id_ciudad),
-                        "nombre_ciudad": row_inserted.nombre_ciudad,
-                        "clave_ciudad": row_inserted.clave_ciudad,
-                        "clave_municipio": row_inserted.ciudad_id_municipio
+                        "id_colonia": str(row_inserted.id_colonia),
+                    "nombre_colonia": row_inserted.nombre_colonia,
+                    "tipo_colonia": row_inserted.tipo_colonia,
+                    "zona_colonia": row_inserted.zona_colonia,
+                    "codigo_postal": row_inserted.codigo_postal,
+                    "id_ciudad": str(row_inserted.colonia_id_ciudad)
                     })
 
             except SQLAlchemyError as exc:
@@ -168,7 +170,7 @@ class ColoniaModel(Base):
                 logger.exception('An exception was occurred while execute transactions: %s', str(str(exc.args) + ':' +
                                                                                                  str(exc.code)))
                 raise mvc_exc.IntegrityError(
-                    'Row not stored in "{}". IntegrityError: {}'.format(data.get('nombre_ciudad'),
+                    'Row not stored in "{}". IntegrityError: {}'.format(data.get('nombre_colonia'),
                                                                         str(str(exc.args) + ':' + str(exc.code)))
                 )
             finally:
@@ -246,7 +248,7 @@ class ColoniaModel(Base):
 
             raise mvc_exc.ItemNotStored(
                 'Can\'t read data: "{}" because it\'s not stored in "{}". Row empty: {}'.format(
-                    data.get('nombre_ciudad'), CiudadModel.__tablename__, str(str(exc.args) + ':' + str(exc.code))
+                    data.get('nombre_colonia'), ColoniaModel.__tablename__, str(str(exc.args) + ':' + str(exc.code))
                 )
             )
 
@@ -256,50 +258,54 @@ class ColoniaModel(Base):
         return row
 
     @staticmethod
-    def get_all_cities(session, data):
+    def get_all_suburbs(session, data):
         """
-        Get all Ciudades objects data registered on database.
+        Get all Colonias objects data registered on database.
 
         :param data: Dictionary contains relevant data to filter Query on resultSet DB
         :param session: Database session
         :return: json.dumps dict
         """
 
-        all_cities = None
-        city_data = []
+        all_suburbs = None
+        suburb_data = []
 
         page = None
         per_page = None
 
-        all_cities = session.query(CiudadModel).all()
+        all_suburbs = session.query(ColoniaModel).all()
 
         if 'offset' in data.keys() and 'limit' in data.keys():
             page = data.get('offset')
             per_page = data('limit')
 
-            all_cities = session.query(CiudadModel).paginate(page=page, per_page=per_page, error_out=False).all()
+            all_suburbs = session.query(ColoniaModel).paginate(page=page, per_page=per_page, error_out=False).all()
 
-        for city in all_cities:
-            city_id = city.id_ciudad
-            city_name = city.nombre_ciudad
-            city_key = city.clave_ciudad
-            city_id_town = city.ciudad_id_municipio
+        for suburb in all_suburbs:
+            suburb_id = suburb.id_colonia
+            suburb_name = suburb.nombre_colonia
+            suburb_type = suburb.tipo_colonia
+            suburn_zone = suburb.zona_colonia
+            zip_postal_code = suburb.codigo_postal
+            city_id = suburb.colonia_id_ciudad
 
-            city_data += [{
-                "State": {
-                    "id_ciudad": str(city_id),
-                    "nombre_ciudad": city_name,
-                    "clave_ciudad": city_key,
-                    "clave_municipio": city_id_town
+            suburb_data += [{
+                "Suburb": {
+                    "id_colonia": str(suburb_id),
+                    "nombre_colonia": suburb_name,
+                    "tipo_colonia": suburb_type,
+                    "zona_colonia": suburn_zone,
+                    "codigo_postal": zip_postal_code,
+                    "id_ciudad": str(city_id)
                 }
             }]
 
-        return json.dumps(city_data)
+        return json.dumps(suburb_data)
 
     @staticmethod
-    def get_cities_by_filters(session, data, filter_spec):
+    def get_suburbs_by_filters(session, data, filter_spec):
         """
-        Get list of Ciudades filtered by options by user request
+        Get list of Colonias filtered by options by user request
 
         :param session: Database session
         :param data: Dictionary contains relevant data to filter Query on resultSet DB
@@ -311,7 +317,7 @@ class ColoniaModel(Base):
         per_page = 10
 
         query_result = None
-        city_data = []
+        suburb_data = []
 
         if 'offset' in data.keys() and 'limit' in data.keys():
             page = data.get('offset')
@@ -328,28 +334,36 @@ class ColoniaModel(Base):
 
         logger.info('Query filtered resultSet: %s', str(query_result))
 
-        for city in query_result:
-            city_id = city.id_ciudad
-            city_name = city.nombre_ciudad
-            city_key = city.clave_ciudad
-            city_id_town = city.ciudad_id_municipio
+        for suburb in query_result:
+            suburb_id = suburb.id_colonia
+            suburb_name = suburb.nombre_colonia
+            suburb_type = suburb.tipo_colonia
+            suburn_zone = suburb.zona_colonia
+            zip_postal_code = suburb.codigo_postal
+            city_id = suburb.colonia_id_ciudad
 
-            city_data += [{
-                "State": {
-                    "id_ciudad": str(city_id),
-                    "nombre_ciudad": city_name,
-                    "clave_ciudad": city_key,
-                    "clave_municipio": city_id_town
+            suburb_data += [{
+                "Suburb": {
+                    "id_colonia": str(suburb_id),
+                    "nombre_colonia": suburb_name,
+                    "tipo_colonia": suburb_type,
+                    "zona_colonia": suburn_zone,
+                    "codigo_postal": zip_postal_code,
+                    "id_ciudad": str(city_id)
                 }
             }]
 
-        return json.dumps(city_data)
+        return json.dumps(suburb_data)
 
     def __repr__(self):
-        return "<CiudadModel(id_ciudad='%s', " \
-               "             nombre_ciudad='%s', " \
-               "             clave_ciudad='%s', " \
-               "             ciudad_id_municipio='%s')>" % (self.id_ciudad,
-                                                            self.nombre_ciudad,
-                                                            self.clave_ciudad,
-                                                            self.ciudad_id_municipio)
+        return "<ColoniaModel(id_colonia='%s', " \
+               "              nombre_colonia='%s', " \
+               "              tipo_colonia='%s', " \
+               "              zona_colonia='%s', " \
+               "              codigo_postal='%s', " \
+               "              colonia_id_ciudad='%s')>" % (self.id_colonia,
+                                                           self.nombre_colonia,
+                                                           self.tipo_colonia,
+                                                           self.zona_colonia,
+                                                           self.codigo_postal,
+                                                           self.colonia_id_ciudad)
