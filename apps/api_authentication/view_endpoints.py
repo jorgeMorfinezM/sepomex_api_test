@@ -47,7 +47,7 @@ def activate_job():
 @authorization_api.route('/')
 def main():
 
-    return render_template('gas_manager_api.html')
+    return render_template('api_manage_sepomex.html')
 
 
 @authorization_api.route('/logout/')
