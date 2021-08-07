@@ -10,10 +10,8 @@ Each one of the CRUD operations should be able to open a database connection if
 there isn't already one available (check if there are any issues with this).
 
 Documentation:
-    About the Vehicle data on the database to generate CRUD operations from endpoint of the API:
+    About the States data on the database to generate CRUD operations from endpoint of the API:
     - Insert data
-    - Update data
-    - Delete data
     - Search data
 
 """
@@ -37,19 +35,21 @@ ESTADO_ID_SEQ = Sequence('estado_seq')  # define sequence explicitly
 
 
 class EstadoModel(Base):
+
     r"""
     Class to instance the data of EstadoModel on the database.
+
     Transactions:
      - Insert: Add data to the database if not exists.
      - Select:
     """
 
-    __tablename__ = cfg_db.states_table.__str__()
+    __tablename__ = 'estado'
 
-    id_estado = Column(cfg_db.States.state_id, Integer, ESTADO_ID_SEQ,
+    id_estado = Column('id_estado', Integer, ESTADO_ID_SEQ,
                        primary_key=True, server_default=ESTADO_ID_SEQ.next_value())
-    nombre_estado = Column(cfg_db.States.state_name, String, nullable=False, index=True)
-    clave_estado = Column(cfg_db.States.state_key, Integer, nullable=False, index=True)
+    nombre_estado = Column('nombre_estado', String, nullable=False, index=True)
+    clave_estado = Column('clave_estado', Integer, nullable=False, index=True)
 
     def __init__(self, data_driver):
         self.nombre_estado = data_driver.get('nombre_estado')

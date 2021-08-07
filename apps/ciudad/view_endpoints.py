@@ -11,7 +11,7 @@ __history__ = """ """
 __version__ = "1.21.H05.1 ($Rev: 2 $)"
 
 from flask import Blueprint, json, request
-# from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required
 from db_controller.database_backend import *
 from .CiudadModel import CiudadModel
 from handler_controller.ResponsesHandler import ResponsesHandler as HandlerResponse
@@ -27,7 +27,7 @@ logger = configure_logger('ws')
 
 
 @city_api.route('/', methods=['POST', 'GET'])
-# @jwt_required
+@jwt_required
 def endpoint_manage_city_data():
     conn_db, session_db = init_db_connection()
 
@@ -80,6 +80,7 @@ def endpoint_manage_city_data():
 
 
 @city_api.route('/filter', methods=['GET'])
+@jwt_required
 def get_looking_for_cities():
     conn_db, session_db = init_db_connection()
 

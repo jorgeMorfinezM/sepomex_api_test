@@ -20,13 +20,10 @@ from sqlalchemy_utils import database_exists, create_database
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.declarative import declarative_base
-
 from sqlalchemy.engine.reflection import Inspector
-
 from db_controller import mvc_exceptions as mvc_exc
 from logger_controller.logger_control import *
 from utilities.Utility import *
-
 from flask_bcrypt import Bcrypt
 
 Base = declarative_base()
@@ -74,12 +71,11 @@ def create_bd_objects(engine_obj):
 
     table_names = list()
 
-    table_names.append(cfg_db.gas_driver_table.__str__())
-    table_names.append(cfg_db.gas_manager_vehicle_table.__str__())
-    table_names.append(cfg_db.gas_vehicle_table.__str__())
-    table_names.append(cfg_db.gas_odometer_vehicle_table.__str__())
-    table_names.append(cfg_db.gas_document_vehicle_table.__str__())
-    table_names.append(cfg_db.gas_service_vehicle_table.__str__())
+    table_names.append(cfg_db.user_auth_table.__str__())
+    table_names.append(cfg_db.states_table.__str__())
+    table_names.append(cfg_db.town_table.__str__())
+    table_names.append(cfg_db.city_table.__str__())
+    table_names.append(cfg_db.suburb_table.__str__())
 
     if not inspector.get_table_names():
         Base.metadata.create_all(bind=engine_obj)

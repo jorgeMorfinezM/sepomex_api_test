@@ -47,20 +47,20 @@ class ColoniaModel(Base):
      - Select:
     """
 
-    __tablename__ = cfg_db.suburb_table.__str__()
+    __tablename__ = 'colonia'
 
-    id_colonia = Column(cfg_db.Suburb.suburb_id, Integer, SUBURB_ID_SEQ,
+    id_colonia = Column('id_colonia', Integer, SUBURB_ID_SEQ,
                         primary_key=True, server_default=SUBURB_ID_SEQ.next_value())
-    nombre_colonia = Column(cfg_db.Suburb.suburb_name, String, nullable=False, index=True)
+    nombre_colonia = Column('nombre_colonia', String, nullable=False, index=True)
 
-    tipo_colonia = Column(cfg_db.Suburb.suburb_type, String, nullable=False)
+    tipo_colonia = Column('tipo_asentamiento', String, nullable=False)
 
-    zona_colonia = Column(cfg_db.Suburb.suburb_zone, String, nullable=False)
+    zona_colonia = Column('zona_asentamiento', String, nullable=False)
 
-    codigo_postal = Column(cfg_db.Suburb.suburb_postal_code, String, nullable=False, index=True)
+    codigo_postal = Column('codigo_postal', String, nullable=False, index=True)
 
     colonia_id_ciudad = Column(
-        cfg_db.Suburb.suburb_city_id,
+        'id_ciudad',
         Integer,
         ForeignKey('CiudadModel.id_ciudad', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=True,

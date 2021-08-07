@@ -43,10 +43,9 @@ def activate_job():
 
 # Contiene la llamada al HTML que soporta la documentacion de la API,
 # sus metodos, y endpoints con los modelos de datos I/O
-@authorization_api.before_app_first_request(activate_job())
+# @authorization_api.before_app_first_request(activate_job())
 @authorization_api.route('/')
 def main():
-
     return render_template('api_manage_sepomex.html')
 
 

@@ -47,15 +47,15 @@ class CiudadModel(Base):
      - Select:
     """
 
-    __tablename__ = cfg_db.city_table.__str__()
+    __tablename__ = 'ciudad'
 
-    id_ciudad = Column(cfg_db.City.city_id, Integer, CITY_ID_SEQ,
+    id_ciudad = Column('id_ciudad', Integer, CITY_ID_SEQ,
                        primary_key=True, server_default=CITY_ID_SEQ.next_value())
-    nombre_ciudad = Column(cfg_db.City.city_name, String, nullable=False, index=True)
-    clave_ciudad = Column(cfg_db.City.city_key, Integer, nullable=False, index=True)
+    nombre_ciudad = Column('nombre_ciudad', String, nullable=False, index=True)
+    clave_ciudad = Column('clave_ciudad', Integer, nullable=False, index=True)
 
     ciudad_id_municipio = Column(
-        cfg_db.City.city_town_id,
+        'id_municipio',
         Integer,
         ForeignKey('MunicipioModel.id_municipio', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=True,

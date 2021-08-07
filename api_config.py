@@ -19,7 +19,6 @@ from apps.estado.view_endpoints import state_api
 from apps.municipio.view_endpoints import town_api
 from apps.ciudad.view_endpoints import city_api
 from apps.colonia.view_endpoints import suburb_api
-
 from utilities.Utility import *
 
 cfg_db = get_config_settings_db()
@@ -42,7 +41,7 @@ def create_app():
     app_api.config['SQLALCHEMY_DATABASE_URI'] = cfg_db.Development.SQLALCHEMY_DATABASE_URI.__str__()
 
     # USER
-    app_api.register_blueprint(authorization_api, url_prefix='/api/v1/manager/sepomex')
+    app_api.register_blueprint(authorization_api, url_prefix='/api/v1/manager/sepomex/')
 
     # STATE
     app_api.register_blueprint(state_api, url_prefix='/api/v1/manager/sepomex/estado')
@@ -56,8 +55,8 @@ def create_app():
     # SUBURB
     app_api.register_blueprint(suburb_api, url_prefix='/api/v1/manager/sepomex/colonia')
 
-    jwt = JWTManager(app_api)
+    jwt_manager = JWTManager(app_api)
 
-    jwt.init_app(app_api)
+    jwt_manager.init_app(app_api)
 
     return app_api

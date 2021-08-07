@@ -11,16 +11,18 @@ __history__ = """ """
 __version__ = "1.21.G02.1 ($Rev: 2 $)"
 
 import json
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Blueprint
 from werkzeug import exceptions
 # import api_config
 
-app = Flask(__name__)
+# app = Flask(__name__)
+handler_error_api = Blueprint('handler_error_api', __name__)
 
 
 class ResponsesHandler(exceptions.HTTPException):
 
-    @app.errorhandler(200)
+    @handler_error_api.errorhandler(200)
+    # @staticmethod
     def response_success(self, data, msg):
 
         if bool(data):
@@ -38,7 +40,8 @@ class ResponsesHandler(exceptions.HTTPException):
 
         return resp, status_code
 
-    @app.errorhandler(201)
+    @handler_error_api.errorhandler(201)
+    # @staticmethod
     def response_resource_created(self, data, msg):
 
         if bool(data):
@@ -56,7 +59,7 @@ class ResponsesHandler(exceptions.HTTPException):
 
         return resp, status_code
 
-    @app.errorhandler(400)
+    @handler_error_api.errorhandler(400)
     def bad_request(self, msg):
         message = {
             'message': msg + request.url,
@@ -68,7 +71,7 @@ class ResponsesHandler(exceptions.HTTPException):
 
         return resp, status_code
 
-    @app.errorhandler(401)
+    @handler_error_api.errorhandler(401)
     def request_unauthorized(self, msg):
         message = {
             'message': msg + request.url,
@@ -80,7 +83,7 @@ class ResponsesHandler(exceptions.HTTPException):
 
         return resp, status_code
 
-    @app.errorhandler(404)
+    @handler_error_api.errorhandler(404)
     def request_not_found(self, msg):
         message = {
             'message': msg + request.url,
@@ -92,7 +95,7 @@ class ResponsesHandler(exceptions.HTTPException):
 
         return resp, status_code
 
-    @app.errorhandler(405)
+    @handler_error_api.errorhandler(405)
     def request_method_not_allowed(self, msg):
         message = {
             'message': msg + request.url,
@@ -104,7 +107,7 @@ class ResponsesHandler(exceptions.HTTPException):
 
         return resp, status_code
 
-    @app.errorhandler(409)
+    @handler_error_api.errorhandler(409)
     def request_conflict(self, msg):
         message = {
             'message': msg + request.url,
@@ -116,7 +119,7 @@ class ResponsesHandler(exceptions.HTTPException):
 
         return resp, status_code
 
-    @app.errorhandler(500)
+    @handler_error_api.errorhandler(500)
     def internal_server_error(self, msg):
         message = {
             'message': msg + request.url,
@@ -128,7 +131,7 @@ class ResponsesHandler(exceptions.HTTPException):
 
         return resp, status_code
 
-    @app.errorhandler(503)
+    @handler_error_api.errorhandler(503)
     def service_unavailable(self, msg):
         message = {
             'message': msg + request.url,

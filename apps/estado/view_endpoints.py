@@ -11,7 +11,7 @@ __history__ = """ """
 __version__ = "1.21.H05.1 ($Rev: 2 $)"
 
 from flask import Blueprint, json, request
-# from flask_jwt_extended import jwt_required
+from flask_jwt_extended import JWTManager, jwt_required
 from db_controller.database_backend import *
 from .EstadoModel import EstadoModel
 from handler_controller.ResponsesHandler import ResponsesHandler as HandlerResponse
@@ -21,12 +21,12 @@ from utilities.Utility import *
 
 cfg_app = get_config_settings_app()
 state_api = Blueprint('state_api', __name__)
-# jwt = JWTManager(bancos_api)
+jwt = JWTManager(state_api)
 logger = configure_logger('ws')
 
 
 @state_api.route('/', methods=['POST', 'GET'])
-# @jwt_required
+@jwt_required
 def endpoint_manage_state_data():
     conn_db, session_db = init_db_connection()
 
@@ -78,6 +78,7 @@ def endpoint_manage_state_data():
 
 
 @state_api.route('/filter', methods=['GET'])
+@jwt_required
 def get_looking_for_state():
     conn_db, session_db = init_db_connection()
 
